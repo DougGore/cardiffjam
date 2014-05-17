@@ -11,6 +11,7 @@ import QtQuick.Window 2.0
 import QtGraphicalEffects 1.0
 
 Rectangle {
+    id: background
     width: Screen.width
     height: Screen.height
     color: "black"
@@ -19,62 +20,77 @@ Rectangle {
         anchors.fill: parent
         visible: true
         id: particles
-        /*
-        Emitter {
-            group: "stars"
-            emitRate: 800
-            lifeSpan: 2400
-            size: 24
-            sizeVariation: 8
-            anchors.fill: parent
-        }
-*/
-        // ![0]
+
+        //
         ImageParticle {
             anchors.fill: parent
+
+            // Source image Qt 5.2 has built in ones but for
             //source: "qrc:///particleresources/fuzzydot.png"
             source: "fuzzydot.png"
+
+            // Varying the level of transparency of the sparks
             alpha: 0.5
-            alphaVariation: 0.5
+            alphaVariation: 0.4
+
+            // We want our sparks to grow as they appar
             entryEffect: ImageParticle.Scale
+
+            // Put some spin on them
             rotationVelocity: 200
+
+            // We use a 1D (1px high) image to make the appearance
+            // non-linear
             opacityTable: "spark_opacity.png"
+
+            // Make the sparks orange
             color: "#FF8A10"
         }
-        // ![0]
 
+        // Apply some gravity so the sparks will start to fall
         Gravity {
-            //system: sys
-            magnitude: 800
             angle: 90
+            magnitude: 800
         }
 
+        // The emitter is where we fire the particles from
         Emitter {
-            //anchors.centerIn: parent
+            // Put the emitter central and push it slightly off the bottom of the screen
             anchors.horizontalCenter: parent.horizontalCenter
             y: parent.height + 60
+
+            // Emit 300 particles per second
             emitRate: 300
+
+            // Our particles wil live for 1500ms +/- 600ms
             lifeSpan: 1500
             lifeSpanVariation: 600
+
+            // Size will be 32px +/- 16px
             size: 32
             sizeVariation: 16
-            velocity: AngleDirection { angle: -90; angleVariation: 45; magnitude: 800; magnitudeVariation: 500 }
+
+
+            velocity: AngleDirection {
+                // Make angle point straight up (0 is righgt)
+                angle: -90;
+
+                // Vary that angle +/- 45 degrees to give us a nice arc
+                angleVariation: 45;
+
+                // Magnitude in pixels/second, using the screen height as a reference
+                magnitude: background.height * 1.05
+                magnitudeVariation: background.height * 0.6
+            }
         }
 
         Turbulence {
             anchors.fill: parent
             strength: 4
         }
-
-        /*
-        Wander {
-            affectedParameter: Wander.Position
-            xVariance: 3200
-            yVariance: 3200
-        }
-        */
     }
 
+    // Put a title at the top
     Text {
         id: textCaption
         anchors.horizontalCenter: parent.horizontalCenter
